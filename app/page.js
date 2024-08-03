@@ -1,95 +1,142 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+'use client'
+import { Box, Typography, Modal, Stack, Paper, TextField, Button, Container, Grid, Divider } from '@mui/material';
+import Image from 'next/image';
+import { useState, useEffect, useMemo } from 'react';
+import { firestore } from '@/firebase';
+import { collection, query, getDoc, getDocs, setDoc, doc, deleteDoc, setSearchQuery, searchQuery } from 'firebase/firestore';
+import ItemList from './components/itemList';
+import ModalComponent from './components/modalComponent';
+import SearchBar from './components/searchBar';
+import SortSelect from './components/sortSelect';
+
 
 export default function Home() {
+  const [inventory, setInventory] = useState([]);
+  const [open, setOpen] = useState(false);
+  const [itemName, setItemName] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [sortOrder, setSortOrder] = useState('');
+
+  const updateInventory = async () => {
+    const snapshot = query(collection(firestore, 'inventory'))
+    const docs = await getDocs(snapshot);
+
+    const inventoryList = []
+    docs.forEach((doc) => {
+      inventoryList.push({
+        name: doc.id,
+        ...doc.data(),
+      })
+    })
+    setInventory(inventoryList);
+    console.log('Inventory List:', inventoryList);
+  }
+
+  const removeItem = async (item) => {
+    const docRef = doc(collection(firestore, 'inventory'), item);
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      const { quantity } = docSnap.data()
+      if (quantity === 1) {
+        await deleteDoc(docRef);
+      } else {
+        await setDoc(docRef, { quantity: quantity - 1 });
+      }
+    }
+
+    await updateInventory();
+  }
+
+  const addItem = async (item) => {
+    const docRef = doc(collection(firestore, 'inventory'), item);
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      const { quantity } = docSnap.data()
+      await setDoc(docRef, { quantity: quantity + 1 });
+    } else {
+      await setDoc(docRef, { quantity: 1 });
+    }
+
+    await updateInventory();
+  }
+
+  useEffect(() => {
+    updateInventory();
+  }, [])
+
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
+
+  const filteredInventory = useMemo(() => {
+    return inventory.filter(item => item.name.toLowerCase().includes(searchQuery.toLowerCase()));
+  }, [inventory, searchQuery]);
+
+  const sortedFilteredInventory = useMemo(() => {
+    return filteredInventory.sort((a,b) => {
+      switch(sortOrder) {
+        case 'name_asc':
+          return a.name.localeCompare(b.name);
+        case 'name_desc':
+          return b.name.localeCompare(a.name);
+        case 'quantity_asc':
+          return a.quantity - b.quantity;
+        case 'quantity_desc':
+          return b.quantity - a.quantity;
+      }
+    });
+  }, [filteredInventory, sortOrder])
+
   return (
-    <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>app/page.js</code>
-        </p>
-        <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div>
+    <Container sx={{ py: 5, height: "100vh"}}>
+      {/* app title */}
+      <Grid container direction="column" spacing={4} justifyContent="center" alignItems="center">
+        <Grid item>
+          <Typography variant="h2" color="#333" p={2} textAlign="center">
+            Inventory Manager
+          </Typography>
+        </Grid>
+        <Divider variant="middle" sx={{width:'65%'}} />
+        <Grid item> 
+          <Box sx={{ height: 25 }}> </Box>
+        </Grid>
+      </Grid>
 
-      <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
+      {/* modal */}
+      <ModalComponent open={open} handleClose={handleClose} itemName={itemName} setItemName={setItemName} addItem={addItem}/>
 
-      <div className={styles.grid}>
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p>Find in-depth information about Next.js features and API.</p>
-        </a>
+      <Grid container spacing={2} direction="column" justifyContent="center" alignItems="center">
+        {/* add new item button */}
+        <Grid item xs={12} sx={{mb:4}}>
+          <Button variant="contained" onClick={() => handleOpen()}> Add New Item </Button>
+        </Grid>
 
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Learn <span>-&gt;</span>
-          </h2>
-          <p>Learn about Next.js in an interactive course with&nbsp;quizzes!</p>
-        </a>
+        <Grid container spacing={4} justifyContent="center" alignItems="center">
+          <Grid item xs={6} display="flex" justifyContent="flex-end">
+            {/* sort by form */}
+            <SortSelect sortOrder={sortOrder} setSortOrder={setSortOrder}/>
+          </Grid>
+          <Grid item xs={6} display="flex" justifyContent="flex-start">
+            {/* search items bar */}
+            <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery}/>
+          </Grid>
+        </Grid>
+      </Grid>
 
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p>Explore starter templates for Next.js.</p>
-        </a>
+      
+      <Grid container spacing={2} direction="column" justifyContent="center" alignItems="center" sx={{ mt: 4 }} >
+        <Grid item xs={12}>
+          <Typography variant="h4" p={2} color="#333">Inventory Items</Typography>
+        </Grid>
 
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
+        <Divider variant="middle" sx={{ width: '65%' }} />
+
+        <ItemList inventory={sortedFilteredInventory} addItem={addItem} removeItem={removeItem}/>
+      
+      </Grid>
+
+    </Container>
   );
+
 }
