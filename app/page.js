@@ -1,6 +1,7 @@
 'use client'
 import { Box, Typography, Modal, Stack, Paper, TextField, Button, Container, Grid, Divider } from '@mui/material';
 import Image from 'next/image';
+import firebase from '@/firebase';
 import { useState, useEffect, useMemo } from 'react';
 import { firestore, storage } from '@/firebase';
 import {collection, query, getDoc, getDocs, setDoc, doc, deleteDoc} from 'firebase/firestore';
