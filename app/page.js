@@ -11,6 +11,8 @@ import ModalComponent from './components/modalComponent';
 import SearchBar from './components/searchBar';
 import SortSelect from './components/sortSelect';
 
+// todo: add reupload image button
+// issue: deleting 1 of an item also removes image...
 
 export default function Home() {
   const [inventory, setInventory] = useState([]);
@@ -129,7 +131,7 @@ export default function Home() {
   }, [filteredInventory, sortOrder])
 
   return (
-    <Container sx={{ py: 5, height: "110vh"}}>
+    <Container sx={{ py: 5, height: "110vh", backgroundColor: 'transparent'}}>
       {/* app title */}
       <Grid container direction="column" spacing={4} justifyContent="center" alignItems="center">
         <Grid item>
