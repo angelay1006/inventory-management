@@ -7,13 +7,20 @@ function ItemList({ inventory, addItem, removeItem }) {
             {inventory.length > 0 ? (
                 inventory.map(item => (
                     <Grid item xs={12} sx={{ mt: '2rem', mb: '2rem', margin: 'auto' }} key={item.name}>
-                        <Item name={item.name} quantity={item.quantity} addItem={addItem} removeItem={removeItem} />
+                        <Item 
+                            name={item.name} 
+                            quantity={item.quantity} 
+                            addItem={addItem} 
+                            removeItem={removeItem} 
+                            images={item.images} // passing image prop
+                        />
                     </Grid>
                 ))
             ) : (
                 <Grid item xs={12} sx={{ maxWidth: '65%', width: '65%', mt: '2rem' }}>
-                    <Paper sx={{ width: '100%', padding: 3, display: 'flex', justifyContent: 'center' }}>
-                        <Typography variant="h6">No matches found</Typography>
+                    <Paper sx={{ width: '100%', padding: 3, display: 'flex', flexDirection:'column', justifyContent: 'center', alignItems: 'center', elevation:2 }}>
+                        <Typography variant="h6">No matches found. </Typography>
+                        <Typography variant="h7" sx={{paddingTop: '1vh', color: 'gray'}}> Add some items! </Typography>
                     </Paper>
                 </Grid>
             )}

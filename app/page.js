@@ -128,12 +128,12 @@ export default function Home() {
   }, [filteredInventory, sortOrder])
 
   return (
-    <Container sx={{ py: 5, height: "100vh"}}>
+    <Container sx={{ py: 5, height: "110vh"}}>
       {/* app title */}
       <Grid container direction="column" spacing={4} justifyContent="center" alignItems="center">
         <Grid item>
           <Typography variant="h2" color="#333" p={2} textAlign="center">
-            Inventory Manager
+            🧳 Inventory Manager 🧳
           </Typography>
         </Grid>
         <Divider variant="middle" sx={{width:'65%'}} />
