@@ -1,11 +1,11 @@
 import { useDropzone } from 'react-dropzone';
 import React, { useState } from 'react';
 import { Grid, Alert, Snackbar, useMediaQuery, Box } from '@mui/material';
-import { useTheme, theme } from '@mui/material/styles';
+import { useTheme } from '@mui/material/styles';
 
 // handles file selection and provides previews
 
-function MyDropzone() {
+function MyDropzone({onFilesSelected}) {
     const [previews, setPreviews] = useState([]);
     const [alertOpen, setAlertOpen] = useState(false);
 
@@ -19,12 +19,19 @@ function MyDropzone() {
         },
         onDrop: (acceptedFiles, fileRejections) => {
             // Handle accepted files
-            const newPreviews = acceptedFiles.map((file) =>
-                Object.assign(file, {
-                    preview: URL.createObjectURL(file),
-                })
-            );
-            setPreviews(newPreviews);
+            if (acceptedFiles.length > 0) {
+                const newPreviews = acceptedFiles.map((file) =>
+                    Object.assign(file, {
+                        preview: URL.createObjectURL(file),
+                    })
+                );
+                setPreviews(newPreviews);
+
+                // trigger parent callback for accepted files only
+                onFilesSelected(newPreviews);
+
+            }
+            
 
             // Handle rejected files
             if (fileRejections.length > 0) {
@@ -59,7 +66,8 @@ function MyDropzone() {
                 }}
             >
                 <input {...getInputProps({ capture: 'environment' })} />
-                <p>Drag & drop an image here, or click to select files</p>
+                <p>Drag & drop an image here, or click to select files (optional) </p>
+                
                 <Grid container spacing={2} justifyContent="center" alignItems="center" sx={{ marginTop: '1vh' }}>
                     {previews.map((file, index) => (
                         <Grid item xs={12} sm={6} md={6} lg={6} key={index}>

@@ -1,5 +1,8 @@
 // displays individual inventory items and action buttons
-import { Paper, Typography, Stack, Button } from '@mui/material';
+import React from 'react';
+import { Paper, Typography, Stack, Button, Accordion, AccordionSummary, AccordionDetails, CardMedia } from '@mui/material';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+
 
 function Item({ name, quantity, addItem, removeItem }) {
     return (

@@ -2,8 +2,9 @@
 import { Box, Typography, Modal, Stack, Paper, TextField, Button, Container, Grid, Divider } from '@mui/material';
 import Image from 'next/image';
 import { useState, useEffect, useMemo } from 'react';
-import { firestore } from '@/firebase';
-import { collection, query, getDoc, getDocs, setDoc, doc, deleteDoc, setSearchQuery, searchQuery } from 'firebase/firestore';
+import { firestore, storage } from '@/firebase';
+import {collection, query, getDoc, getDocs, setDoc, doc, deleteDoc} from 'firebase/firestore';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import ItemList from './components/itemList';
 import ModalComponent from './components/modalComponent';
 import SearchBar from './components/searchBar';
@@ -16,6 +17,7 @@ export default function Home() {
   const [itemName, setItemName] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [sortOrder, setSortOrder] = useState('');
+  const [selectedFiles, setSelectedFiles] = useState([]);
 
   const updateInventory = async () => {
     const snapshot = query(collection(firestore, 'inventory'))
@@ -62,6 +64,43 @@ export default function Home() {
     await updateInventory();
   }
 
+  // file uploads (pictures) 
+  const handleUpload = async (files, itemName) => {
+    try {
+      const filePromises = files.map(async (file) => {
+        const storageRef = ref(storage, `images/${file.name}`);
+        await uploadBytes(storageRef, file);
+        const url = await getDownloadURL(storageRef);
+        console.log(`Uploaded ${file.name} to ${url}`); // Debugging log
+        return {
+          name: file.name,
+          url,
+        };
+      });
+
+      const uploadedFiles = await Promise.all(filePromises);
+      console.log('Uploaded files:', uploadedFiles); // Debugging log
+
+      // store metadata in firestore
+      await setDoc(doc(collection(firestore, 'inventory'), itemName), {
+        name: itemName,
+        images: uploadedFiles,
+        quantity: 1, 
+        createdAt: new Date(),
+      }, {merge: true});
+
+      console.log('files uploaded & metadata stored success!!');
+
+      setSelectedFiles([]); // reset selected files after upload
+      setItemName('');
+      setOpen(false); // close modal after successful upload
+      await updateInventory();
+
+    } catch(err) {
+      console.error('Error uploading files', err)
+    }
+  }
+
   useEffect(() => {
     updateInventory();
   }, [])
@@ -104,7 +143,10 @@ export default function Home() {
       </Grid>
 
       {/* modal */}
-      <ModalComponent open={open} handleClose={handleClose} itemName={itemName} setItemName={setItemName} addItem={addItem}/>
+      <ModalComponent open={open} handleClose={handleClose} itemName={itemName} 
+        setItemName={setItemName} addItem={addItem} handleUpload={handleUpload}
+        setSelectedFiles={setSelectedFiles}
+      />
 
       <Grid container spacing={2} direction="column" justifyContent="center" alignItems="center">
         {/* add new item button */}
