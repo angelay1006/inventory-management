@@ -4,7 +4,7 @@ import Image from 'next/image';
 import firebase from '@/firebase';
 import { useState, useEffect, useMemo } from 'react';
 import { firestore, storage } from '@/firebase';
-import {collection, query, getDoc, getDocs, setDoc, doc, deleteDoc} from 'firebase/firestore';
+import { collection, query, getDoc, getDocs, setDoc, doc, deleteDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import ItemList from './components/itemList';
 import ModalComponent from './components/modalComponent';
@@ -88,9 +88,9 @@ export default function Home() {
       await setDoc(doc(collection(firestore, 'inventory'), itemName), {
         name: itemName,
         images: uploadedFiles,
-        quantity: 1, 
+        quantity: 1,
         createdAt: new Date(),
-      }, {merge: true});
+      }, { merge: true });
 
       console.log('files uploaded & metadata stored success!!');
 
@@ -99,7 +99,7 @@ export default function Home() {
       setOpen(false); // close modal after successful upload
       await updateInventory();
 
-    } catch(err) {
+    } catch (err) {
       console.error('Error uploading files', err)
     }
   }
@@ -116,8 +116,8 @@ export default function Home() {
   }, [inventory, searchQuery]);
 
   const sortedFilteredInventory = useMemo(() => {
-    return filteredInventory.sort((a,b) => {
-      switch(sortOrder) {
+    return filteredInventory.sort((a, b) => {
+      switch (sortOrder) {
         case 'name_asc':
           return a.name.localeCompare(b.name);
         case 'name_desc':
@@ -131,45 +131,59 @@ export default function Home() {
   }, [filteredInventory, sortOrder])
 
   return (
-    <Container sx={{ py: 5, height: "110vh", backgroundColor: 'transparent', background:'none'}}>
+    <Container sx={{ py: 5, height: "110vh", backgroundColor: 'transparent', background: 'none' }}>
       {/* app title */}
       <Grid container direction="column" spacing={4} justifyContent="center" alignItems="center">
         <Grid item>
-          <Typography variant="h2" color="#333" p={2} textAlign="center">
+          <Typography variant="h2" color="#333" p={2} textAlign="center" fontWeight="bold" >
             🧳 Inventory Manager 🧳
           </Typography>
         </Grid>
-        <Divider variant="middle" sx={{width:'65%'}} />
-        <Grid item> 
+        <Divider variant="middle" sx={{ width: '65%' }} />
+        <Grid item>
           <Box sx={{ height: 25 }}> </Box>
         </Grid>
       </Grid>
 
       {/* modal */}
-      <ModalComponent open={open} handleClose={handleClose} itemName={itemName} 
+      <ModalComponent open={open} handleClose={handleClose} itemName={itemName}
         setItemName={setItemName} addItem={addItem} handleUpload={handleUpload}
         setSelectedFiles={setSelectedFiles}
       />
 
       <Grid container spacing={2} direction="column" justifyContent="center" alignItems="center">
         {/* add new item button */}
-        <Grid item xs={12} sx={{mb:4}}>
+        <Grid item xs={12} sx={{ mb: 4 }}>
           <Button variant="contained" onClick={() => handleOpen()}> Add New Item </Button>
         </Grid>
 
-        <Grid container spacing={4} justifyContent="center" alignItems="center">
-          <Grid item xs={6} display="flex" justifyContent="flex-end">
+        <Grid container item xs={12} sm={12} spacing={4} alignItems="center" justifyContent="center">
+          <Grid item xs={12} sm={6} display="flex"
+            sx={{
+              justifyContent: {
+                xs: "center",
+                sm: "flex-end",
+              }
+            }}
+          >
             {/* sort by form */}
-            <SortSelect sortOrder={sortOrder} setSortOrder={setSortOrder}/>
+            <SortSelect sortOrder={sortOrder} setSortOrder={setSortOrder} />
           </Grid>
-          <Grid item xs={6} display="flex" justifyContent="flex-start">
+          <Grid item xs={12} sm={6} display="flex"
+            sx={{
+              justifyContent: {
+                xs: "center",
+                sm: "space-between",
+              }
+            }}
+          >
             {/* search items bar */}
-            <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery}/>
+            <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
           </Grid>
         </Grid>
       </Grid>
 
-      
+
       <Grid container spacing={2} direction="column" justifyContent="center" alignItems="center" sx={{ mt: 4 }} >
         <Grid item xs={12}>
           <Typography variant="h4" p={2} color="#333">Inventory Items</Typography>
@@ -177,8 +191,8 @@ export default function Home() {
 
         <Divider variant="middle" sx={{ width: '65%' }} />
 
-        <ItemList inventory={sortedFilteredInventory} addItem={addItem} removeItem={removeItem}/>
-      
+        <ItemList inventory={sortedFilteredInventory} addItem={addItem} removeItem={removeItem} />
+
       </Grid>
 
     </Container>

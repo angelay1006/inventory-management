@@ -87,7 +87,7 @@ function Item({ name, quantity, addItem, removeItem, images }) {
                             key={index}
                             image={image.url}
                             alt={image.name}
-                            sx={{ maxHeight: '25vh', width: 'auto', borderRadius: 1, objectFit: 'cover' }}
+                            sx={{ maxHeight: '15vh', width: 'auto', borderRadius: 1, objectFit: 'cover' }}
                         />
                     ))
                 ) : (
