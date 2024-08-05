@@ -131,7 +131,7 @@ export default function Home() {
   }, [filteredInventory, sortOrder])
 
   return (
-    <Container sx={{ py: 5, height: "110vh", backgroundColor: 'transparent'}}>
+    <Container sx={{ py: 5, height: "110vh", backgroundColor: 'transparent', background:'none'}}>
       {/* app title */}
       <Grid container direction="column" spacing={4} justifyContent="center" alignItems="center">
         <Grid item>
