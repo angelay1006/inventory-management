@@ -1,5 +1,5 @@
 import { Grid, Typography, Paper } from '@mui/material';
-import Item from './item';
+import Item from './item.js';
 
 function ItemList({ inventory, addItem, removeItem }) {
     return (

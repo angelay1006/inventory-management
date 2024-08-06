@@ -1,6 +1,6 @@
 import { Box, TextField, Button, Typography, Stack, Modal, Snackbar, useMediaQuery, Alert} from '@mui/material';
 import React, { useState } from 'react';
-import MyDropzone from './dropzone.js';
+import MyDropzone from './dropzone';
 import { useTheme } from '@mui/material/styles';
 
 function ModalComponent({ open, handleClose, itemName, setItemName, addItem, handleUpload, setSelectedFiles: setParentSelectedFiles}) {
