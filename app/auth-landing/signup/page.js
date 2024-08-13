@@ -17,7 +17,6 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import {createUserWithEmailAndPassword} from 'firebase/auth';
 import {auth} from '../../../firebase.js';
-import Loading from '../../components/loading';
 
 
 
@@ -28,7 +27,6 @@ const defaultTheme = createTheme();
 
 export default function SignUpSide() {
     const[error, setError] = useState('');
-    const [loading, setLoading] = useState(false); 
     const router = useRouter();
 
     const handleSubmit = async (event) => {
@@ -37,8 +35,6 @@ export default function SignUpSide() {
         const email = data.get('email');
         const password = data.get('password');
 
-        // start loading
-        setLoading(true);
 
         try {
             await createUserWithEmailAndPassword(auth, email, password);
@@ -46,15 +42,9 @@ export default function SignUpSide() {
         } catch (err) {
             setError('Failed to sign up. Please try again.');
             console.error('Sign up error:', err);
-        } finally {
-            // end loading
-            setLoading(false);
         }
     };
 
-    if (loading) {
-        return <Loading/>;
-    }
 
     return (
         <ThemeProvider theme={defaultTheme}>
