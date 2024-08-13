@@ -170,7 +170,7 @@ export default function Home() {
       <Grid container direction="column" spacing={4} justifyContent="center" alignItems="center">
         <Grid item>
           <Typography variant="h2" color="#333" p={2} textAlign="center" fontWeight="bold" sx={{fontFamily: "'DM Sans', sans-serif"}} >
-            🧳 Inventory Manager 🧳
+            My Inventory
           </Typography>
         </Grid>
         <Divider variant="middle" sx={{ width: '65%' }} />
