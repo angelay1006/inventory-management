@@ -5,7 +5,7 @@ import firebase from '@/firebase';
 import { useState, useEffect, useMemo } from 'react';
 import { firestore, storage } from '@/firebase';
 import { collection, query, getDoc, getDocs, setDoc, doc, deleteDoc } from 'firebase/firestore';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 import { signOut } from 'firebase/auth';
 import { auth } from '../../firebase';
 import ItemList from '../components/home/itemList';
@@ -13,11 +13,10 @@ import ModalComponent from '../components/home/modalComponent';
 import SearchBar from '../components/home/searchBar';
 import SortSelect from '../components/home/sortSelect';
 import LogoutIcon from '@mui/icons-material/Logout';
+import '../globals.css';
 import IconButton from '@mui/material/IconButton';
 
 
-// todo: add reupload image button
-// issue: deleting 1 of an item also removes image...
 
 export default function Home() {
   const [inventory, setInventory] = useState([]);
@@ -42,33 +41,45 @@ export default function Home() {
     console.log('Inventory List:', inventoryList);
   }
 
-  const removeItem = async (item) => {
-    const docRef = doc(collection(firestore, 'inventory'), item);
-    const docSnap = await getDoc(docRef);
-
-    if (docSnap.exists()) {
-      const { quantity } = docSnap.data()
-      if (quantity === 1) {
-        await deleteDoc(docRef);
-      } else {
-        await setDoc(docRef, { quantity: quantity - 1 });
-      }
-    }
-
-    await updateInventory();
-  }
 
   const addItem = async (item) => {
     const docRef = doc(collection(firestore, 'inventory'), item);
     const docSnap = await getDoc(docRef);
 
     if (docSnap.exists()) {
-      const { quantity } = docSnap.data()
-      await setDoc(docRef, { quantity: quantity + 1 });
+      const {quantity, images = []} = docSnap.data()
+      await setDoc(docRef, {quantity: quantity + 1, images}, {merge: true});
     } else {
-      await setDoc(docRef, { quantity: 1 });
+      await setDoc(docRef, {quantity: 1, images: []});
     }
 
+    await updateInventory();
+  }
+
+
+  const removeItem = async (item) => {
+    const docRef = doc(collection(firestore, 'inventory'), item);
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      const {quantity, images = []} = docSnap.data();
+
+      if (quantity === 1) {
+        // delete document from firestore
+        await deleteDoc(docRef);
+
+        // delete images from firebase storage
+        if (images.length > 0) {
+          const deletePromises = images.map(({name}) => {
+            const imageRef = ref(storage, `images/${name}`);
+            return deleteObject(imageRef);
+          });
+          await Promise.all(deletePromises);
+        }
+      } else {
+        await setDoc(docRef, {quantity: quantity - 1, images}, {merge: true});
+      }
+    }
     await updateInventory();
   }
 
@@ -158,7 +169,7 @@ export default function Home() {
       {/* app title */}
       <Grid container direction="column" spacing={4} justifyContent="center" alignItems="center">
         <Grid item>
-          <Typography variant="h2" color="#333" p={2} textAlign="center" fontWeight="bold" >
+          <Typography variant="h2" color="#333" p={2} textAlign="center" fontWeight="bold" sx={{fontFamily: "'DM Sans', sans-serif"}} >
             🧳 Inventory Manager 🧳
           </Typography>
         </Grid>
