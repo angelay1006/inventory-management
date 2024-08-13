@@ -18,18 +18,21 @@ import { useRouter } from 'next/navigation';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../../../firebase.js';
 import Loading from '../../components/loading';
-import {keyframes} from '@mui/system';
+import { keyframes } from '@mui/system';
+import Image from 'next/image';
+import '../../globals.css';
+import Logo from '../../components/auth-landing/Logo.svg';
 
 const defaultTheme = createTheme();
 
-const gradientAnimation = keyframes`
-0% {
-    background-position: 0%;
-  }
-  100% {
-    background-position: 100%;
-  }
-`;
+// const gradientAnimation = keyframes`
+// 0% {
+//     background-position: 0%;
+//   }
+//   100% {
+//     background-position: 100%;
+//   }
+// `;
 
 export default function SignInSide() {
   const [error, setError] = useState('');
@@ -64,7 +67,7 @@ export default function SignInSide() {
     <ThemeProvider theme={defaultTheme}>
       <Grid container component="main" sx={{ height: '100vh' }}>
         <CssBaseline />
-        
+
         {/* landing page with title */}
         <Grid
           item
@@ -73,9 +76,9 @@ export default function SignInSide() {
           md={7}
           sx={{
             position: 'relative',
-            background: 'linear-gradient(90deg, #FFFFFF, #9C9C9C, #F1EBEB)',
-            backgroundSize: '300% 300%',
-            animation: `${gradientAnimation} 11s alternate infinite`,
+            // background: 'linear-gradient(90deg, #FFFFFF, #9C9C9C, #F1EBEB)',
+            // backgroundSize: '300% 300%',
+            // animation: `${gradientAnimation} 11s alternate infinite`,
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
@@ -92,13 +95,18 @@ export default function SignInSide() {
             }}
           >
             <Grid item>
-                <Typography variant="h6" color="black" sx={{textAlign:'center', fontSize: "1rem"}}> simplify, organize, and optimize your stock </Typography>
+              <Box sx={{ pb: '4vh' }}>
+                <Image src={Logo} alt="logo" width={100} height={100} />
+              </Box>
+            </Grid>
+            <Grid item>
+              <Typography variant="h6" color="#151439" sx={{ textAlign: 'center', fontSize: "1rem", fontFamily: "'DM Sans', sans-serif" }}> simplify, organize, and optimize your stock </Typography>
             </Grid>
             <Grid item>
               <Typography
                 variant="h2"
-                color="black"
-                sx={{textAlign: 'center' }}
+                color="#1E0E62"
+                sx={{ textAlign: 'center', fontFamily: "'DM Sans', sans-serif" }}
               >
                 Inventory Manager
               </Typography>
@@ -161,7 +169,7 @@ export default function SignInSide() {
                 </Grid>
               </Grid>
               <Grid container justifyContent="center" >
-                <Copyright sx={{ mt: 5, position:'absolute', justifyContent: 'center', bottom:'2vh' }} />
+                <Copyright sx={{ mt: 5, position: 'absolute', justifyContent: 'center', bottom: '2vh' }} />
               </Grid>
             </Box>
           </Box>
