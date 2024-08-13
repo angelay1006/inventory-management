@@ -17,27 +17,16 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../../../firebase.js';
-import Loading from '../../components/loading';
-import { keyframes } from '@mui/system';
+
 import Image from 'next/image';
 import '../../globals.css';
 import Logo from '../../components/auth-landing/Logo.svg';
 
 const defaultTheme = createTheme();
 
-// const gradientAnimation = keyframes`
-// 0% {
-//     background-position: 0%;
-//   }
-//   100% {
-//     background-position: 100%;
-//   }
-// `;
 
 export default function SignInSide() {
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
-
   const router = useRouter();
 
   const handleSubmit = async (event) => {
@@ -46,22 +35,16 @@ export default function SignInSide() {
     const email = data.get('email');
     const password = data.get('password');
 
-    setLoading(true);
-
     try {
       await signInWithEmailAndPassword(auth, email, password);
       router.push('/home');
     } catch (err) {
       setError('Failed to sign in. Please check your email and password.');
       console.error('Sign in error:', err);
-    } finally {
-      setLoading(false);
     }
   };
 
-  if (loading) {
-    return <Loading />;
-  }
+
 
   return (
     <ThemeProvider theme={defaultTheme}>
@@ -76,12 +59,12 @@ export default function SignInSide() {
           md={7}
           sx={{
             position: 'relative',
-            // background: 'linear-gradient(90deg, #FFFFFF, #9C9C9C, #F1EBEB)',
-            // backgroundSize: '300% 300%',
-            // animation: `${gradientAnimation} 11s alternate infinite`,
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
+            height: { xs: '65%', sm: '85%' },
+            overflow: 'hidden',
+            pt: { xs: 2, sm: 4 }
           }}
         >
           <Grid
@@ -118,13 +101,17 @@ export default function SignInSide() {
         <Grid item xs={12} sm={6} md={5} component={Paper} elevation={6} square>
           <Box
             sx={{
-              my: 8,
-              mx: 4,
+              height: '100%',
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
+              justifyContent: 'flex-start',
+              overflow: 'hidden',
+              px: 4,
+              py: 8
             }}
           >
+            
             <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
               <LockOutlinedIcon />
             </Avatar>
@@ -167,10 +154,20 @@ export default function SignInSide() {
                     {"Don't have an account? Sign Up"}
                   </Link>
                 </Grid>
+
+
+                <Grid item sx={{
+                  mt: '2vh', 
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  textAlign: 'center',
+                  width: '100%',
+                }}>
+                  <Copyright sx={{paddingTop: '3vh'}} />
+                </Grid>
               </Grid>
-              <Grid container justifyContent="center" >
-                <Copyright sx={{ mt: 5, position: 'absolute', justifyContent: 'center', bottom: '2vh' }} />
-              </Grid>
+
             </Box>
           </Box>
         </Grid>
