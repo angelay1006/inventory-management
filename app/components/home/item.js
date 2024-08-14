@@ -39,20 +39,22 @@ function Item({ name, quantity, addItem, removeItem, images }) {
                         margin: 'auto',
                     }}
                 >
+
+                    {/* item display information */}
                     <Grid container alignItems="center" spacing={2}>
-                        <Grid item xs={6} sm={4}>
+                        <Grid item xs={8} sm={4}>
                             <Typography variant="h6" noWrap>
                                 {name.charAt(0).toUpperCase() + name.slice(1)}
                             </Typography>
 
                         </Grid>
-                        <Grid item xs={6} sm={2}>
+                        <Grid item xs={4} sm={2} sx={{textAlign: {xs: 'right', sm: 'center'}}}>
                             <Typography variant="h6">
                                 {quantity}
                             </Typography>
                         </Grid>
                         <Grid item xs={12} sm={6}>
-                            <Stack direction="row" spacing={2} justifyContent="flex-end">
+                            <Stack direction="row" spacing={2} justifyContent="center">
                                 <Button variant="contained" color="success" onClick={(e) => { e.stopPropagation(); addItem(name) }}>
                                     Add
                                 </Button>

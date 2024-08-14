@@ -3,7 +3,13 @@ import Item from './item.js';
 
 function ItemList({ inventory, addItem, removeItem }) {
     return (
-        <Grid container spacing={2} justifyContent="center" sx={{ width: '70%', overflow: 'auto', maxHeight: '50vh', mb: '3rem', mt: '1rem' }}>
+        <Grid container spacing={2} justifyContent="center" 
+            sx={{width: {xs:'95%', sm:'70%'},
+                overflow: 'auto', 
+                maxHeight: '50vh', 
+                mb: '3rem', 
+                mt: '1rem' }}
+        >
             {inventory.length > 0 ? (
                 inventory.map(item => (
                     <Grid item xs={12} sx={{ mt: '2rem', mb: '2rem', margin: 'auto' }} key={item.name}>
